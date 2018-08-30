@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>编辑</title>
+		<script src="js/mui.min.js"></script>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<script src="https://cdn.bootcss.com/jquery/1.10.2/jquery.min.js"></script>
+		<script src="https://cdn.bootcss.com/vue/2.2.2/vue.min.js"></script>
+		<script src="js/public.js"></script>
+	</head>
+	<style type="text/css">
+		img {
+			width: 80%;
+			margin: 10%;
+		}
+	</style>
+
+	<body>
+		<div class="img-con"></div>
+		<div class="mui-input-group">
+			<div class="mui-input-row">
+				<label>菜名</label>
+				<input class="MenuTitle" type="text" placeholder="请输入">
+			</div>
+			<div class="mui-input-row">
+				<label>类目</label>
+				<select class="MenuCategory" name="" id="category" value="">
+					<option v-for="item in list" :value='item.id'>{{item.categoryTitle}} </option>
+				</select>
+			</div>
+
+			<!--<div class="mui-input-row">
+				<label>图片</label>
+				<input type="file" />
+			</div>-->
+
+			<button type="button" onclick="postData()" class="mui-btn mui-btn-primary" style="margin: 0.5rem 40%;width: 20%;">保存</button>
+
+		</div>
+		<div style="text-align: right;margin: 1rem;">
+			<a href="#" onclick="deleteData()">删除</a>
+		</div>
+	</body>
+
+	<script type="text/javascript">
+		var Param = new Object();
+		Param = getUrlParam();
+
+		mui.ajax(SERVER_URL + 'getMenuCategory', {
+			dataType: 'json',
+			type: 'get',
+			timeout: 10000,
+			async: false,
+			success: function(data) {
+				console.log(data)
+				new Vue({
+					el: '#category',
+					data: {
+						list: data
+					}
+				})
+			},
+			error: function(xhr, type, errorThrown) {
+				console.log(type);
+			}
+		});
+
+		mui.ajax(SERVER_URL + 'getMenuDetail', {
+			data: {
+				_id: Param._id
+			},
+			dataType: 'json',
+			type: 'get',
+			async: false,
+			timeout: 10000,
+			success: function(data) {
+				console.log(data)
+				$(".MenuTitle").val(data[0].MenuTitle)
+				//$('.MenuCategory').val(data[0].MenuCategory)
+				$('.MenuCategory').val(data[0].MenuCategory)
+				$(".img-con").append('<img src="' + SERVER_URL + data[0].MenuUrl + '" alt="预览图" />')
+			},
+			error: function(xhr, type, errorThrown) {
+				console.log(type);
+			}
+		});
+
+		function postData() {
+			console.log($(".MenuTitle").val())
+			console.log($(".MenuCategory").val())
+			mui.ajax(SERVER_URL + 'updateMenuList', {
+				dataType: 'json',
+				data: {
+					_id: Param._id,
+					MenuTitle: $(".MenuTitle").val(),
+					MenuCategory: $(".MenuCategory").val()
+				},
+				type: 'post',
+				timeout: 10000,
+				async: false,
+				success: function(data) {
+					console.log(data)
+					window.location.href = "mindex.html"
+				},
+				error: function(xhr, type, errorThrown) {
+					console.log(type);
+				}
+			});
+		}
+		
+		function deleteData(){
+			mui.ajax(SERVER_URL + 'deleteMenuList', {
+				dataType: 'json',
+				data: {
+					_id: Param._id
+				},
+				type: 'delete',
+				timeout: 10000,
+				async: false,
+				success: function(data) {
+					console.log(data)
+					window.location.href = "mindex.html"
+				},
+				error: function(xhr, type, errorThrown) {
+					console.log(type);
+				}
+			});
+		}
+	</script>
+
+</html>

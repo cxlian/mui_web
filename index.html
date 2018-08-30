@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<script src="js/mui.min.js"></script>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<script src="https://cdn.bootcss.com/jquery/1.10.2/jquery.min.js">
+			<script src="js/holder.js">
+		</script>
+		<script src="https://cdn.bootcss.com/vue/2.2.2/vue.min.js"></script>
+		<script src="js/public.js"></script>
+		<script type="text/javascript" charset="utf-8">
+			mui.init();
+		</script>
+	</head>
+	<style>
+		body {
+			background-color: white;
+		}
+		/*左边导航*/
+		
+		.mui-row.mui-fullscreen>[class*="mui-col-"] {
+			height: 100%;
+		}
+		
+		.mui-control-content {
+			overflow-y: auto;
+			height: 100%;
+		}
+		
+		.mui-segmented-control .mui-control-item {
+			font-size: 0.9rem;
+			line-height: 2.5rem;
+			width: 100%;
+			border-bottom: none!important;
+			color: #333!important;
+		}
+		
+		.mui-segmented-control .mui-control-item.mui-active {
+			background-color: #fff!important;
+			background: url(images/left_nav_bg.jpg) repeat-y;
+			color: #8c7254!important;
+		}
+		/*右边内容*/
+		
+		.mui-control-content {
+			background-color: white;
+			padding: 1rem 0.6rem;
+		}
+		
+		.myList {
+			margin-top: 0;
+			margin-bottom: 0;
+			padding-left: 0;
+			list-style: none;
+			background-color: #fff;
+		}
+		
+		.myList li {
+			width: 50%;
+			list-style: none;
+			float: left;
+			text-align: center;
+		}
+		
+		.myList li img {
+			width: 88%;
+			height: 20vw;
+			border-radius: 10%;
+		}
+		
+		.myList li p {
+			color: #333;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+		
+		.wishAddDay {
+			float: right;
+			color: #CCCCCC;
+			font-size: 0.8rem;
+		}
+	</style>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<h1 class="mui-title">云菜单</h1>
+		</header>
+		<div class="mui-content mui-row mui-fullscreen">
+			<div class="mui-col-xs-3" style="background: #f7f7f7;" id="category">
+				<div class="mui-segmented-control  mui-segmented-control-vertical">
+					<a class="mui-control-item mui-active" href="javascript:void(0)" attr-id='0'>全部</a>
+					<a v-for="item in list" class="mui-control-item" href="javascript:void(0)" :attr-id='item.id'> {{item.categoryTitle}} </a>
+				</div>
+			</div>
+			<div id="segmentedControlContents" class="mui-col-xs-9">
+				<div id="content" class="mui-control-content mui-active">
+					<ul class="myList">
+						<li v-for="item in list" >
+							<img :src="preUrl+item.MenuUrl" alt="" />
+							<p>{{item.MenuTitle}}</p>
+						</li>
+
+					</ul>
+				</div>
+			</div>
+		</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+
+		$(function() {
+			mui.ajax(SERVER_URL+'getMenuCategory', {
+				dataType: 'json',
+				type: 'get',
+				timeout: 10000,
+				success: function(data) {
+					console.log(data)
+					new Vue({
+						el: '#category',
+						data: {
+							list: data
+						}
+					})
+				},
+				error: function(xhr, type, errorThrown) {
+					console.log(type);
+				}
+			});
+			
+			showCategory(0);
+
+
+			mui('body').on('tap', '.mui-control-item', function() {
+				var menuCategory = $(this).attr("attr-id");
+				showCategory(menuCategory);
+				console.log(menuCategory)
+			});
+			
+			
+			function showCategory(c) {
+				if(c == 0) {
+					mui.ajax(SERVER_URL+'getMenuList', {
+						dataType: 'json',
+						type: 'get',
+						timeout: 10000,
+						success: function(data) {
+							console.log(data)
+							new Vue({
+								el: '#content',
+								data: {
+									preUrl:SERVER_URL,
+									list: data
+								}
+							})
+							
+						},
+						error: function(xhr, type, errorThrown) {
+							console.log(type);
+						}
+					});
+				}
+			}
+		})
+	</script>
+
+</html>
